@@ -75,13 +75,11 @@ var require_shared_cjs = __commonJS((exports) => {
   var isGloballyWhitelisted = /* @__PURE__ */ makeMap(GLOBALS_WHITE_LISTED);
   var range = 2;
   function generateCodeFrame(source, start2 = 0, end = source.length) {
-    let lines = source.split(/(\r?\n)/);
-    const newlineSequences = lines.filter((_, idx) => idx % 2 === 1);
-    lines = lines.filter((_, idx) => idx % 2 === 0);
+    const lines = source.split(/\r?\n/);
     let count = 0;
     const res = [];
     for (let i = 0; i < lines.length; i++) {
-      count += lines[i].length + (newlineSequences[i] && newlineSequences[i].length || 0);
+      count += lines[i].length + 1;
       if (count >= start2) {
         for (let j = i - range; j <= i + range || end > count; j++) {
           if (j < 0 || j >= lines.length)
@@ -89,9 +87,8 @@ var require_shared_cjs = __commonJS((exports) => {
           const line = j + 1;
           res.push(`${line}${" ".repeat(Math.max(3 - String(line).length, 0))}|  ${lines[j]}`);
           const lineLength = lines[j].length;
-          const newLineSeqLength = newlineSequences[j] && newlineSequences[j].length || 0;
           if (j === i) {
-            const pad = start2 - (count - (lineLength + newLineSeqLength));
+            const pad = start2 - (count - lineLength) + 1;
             const length = Math.max(1, end > count ? lineLength - pad : end - start2);
             res.push(`   |  ` + " ".repeat(pad) + "^".repeat(length));
           } else if (j > i) {
@@ -99,7 +96,7 @@ var require_shared_cjs = __commonJS((exports) => {
               const length = Math.max(Math.min(end - count, lineLength), 1);
               res.push(`   |  ` + "^".repeat(length));
             }
-            count += lineLength + newLineSeqLength;
+            count += lineLength + 1;
           }
         }
         break;
@@ -640,33 +637,31 @@ var require_reactivity_cjs = __commonJS((exports) => {
   var shallowGet = /* @__PURE__ */ createGetter(false, true);
   var readonlyGet = /* @__PURE__ */ createGetter(true);
   var shallowReadonlyGet = /* @__PURE__ */ createGetter(true, true);
-  var arrayInstrumentations = /* @__PURE__ */ createArrayInstrumentations();
-  function createArrayInstrumentations() {
-    const instrumentations = {};
-    ["includes", "indexOf", "lastIndexOf"].forEach((key) => {
-      instrumentations[key] = function(...args) {
-        const arr = toRaw2(this);
-        for (let i = 0, l = this.length; i < l; i++) {
-          track(arr, "get", i + "");
-        }
-        const res = arr[key](...args);
-        if (res === -1 || res === false) {
-          return arr[key](...args.map(toRaw2));
-        } else {
-          return res;
-        }
-      };
-    });
-    ["push", "pop", "shift", "unshift", "splice"].forEach((key) => {
-      instrumentations[key] = function(...args) {
-        pauseTracking();
-        const res = toRaw2(this)[key].apply(this, args);
-        resetTracking();
+  var arrayInstrumentations = {};
+  ["includes", "indexOf", "lastIndexOf"].forEach((key) => {
+    const method = Array.prototype[key];
+    arrayInstrumentations[key] = function(...args) {
+      const arr = toRaw2(this);
+      for (let i = 0, l = this.length; i < l; i++) {
+        track(arr, "get", i + "");
+      }
+      const res = method.apply(arr, args);
+      if (res === -1 || res === false) {
+        return method.apply(arr, args.map(toRaw2));
+      } else {
         return res;
-      };
-    });
-    return instrumentations;
-  }
+      }
+    };
+  });
+  ["push", "pop", "shift", "unshift", "splice"].forEach((key) => {
+    const method = Array.prototype[key];
+    arrayInstrumentations[key] = function(...args) {
+      pauseTracking();
+      const res = method.apply(this, args);
+      resetTracking();
+      return res;
+    };
+  });
   function createGetter(isReadonly2 = false, shallow = false) {
     return function get3(target, key, receiver) {
       if (key === "__v_isReactive") {
@@ -767,11 +762,11 @@ var require_reactivity_cjs = __commonJS((exports) => {
       return true;
     }
   };
-  var shallowReactiveHandlers = /* @__PURE__ */ shared.extend({}, mutableHandlers, {
+  var shallowReactiveHandlers = shared.extend({}, mutableHandlers, {
     get: shallowGet,
     set: shallowSet
   });
-  var shallowReadonlyHandlers = /* @__PURE__ */ shared.extend({}, readonlyHandlers, {
+  var shallowReadonlyHandlers = shared.extend({}, readonlyHandlers, {
     get: shallowReadonlyGet
   });
   var toReactive = (value) => shared.isObject(value) ? reactive3(value) : value;
@@ -914,82 +909,73 @@ var require_reactivity_cjs = __commonJS((exports) => {
       return type === "delete" ? false : this;
     };
   }
-  function createInstrumentations() {
-    const mutableInstrumentations2 = {
-      get(key) {
-        return get$1(this, key);
-      },
-      get size() {
-        return size(this);
-      },
-      has: has$1,
-      add,
-      set: set$1,
-      delete: deleteEntry,
-      clear,
-      forEach: createForEach(false, false)
-    };
-    const shallowInstrumentations2 = {
-      get(key) {
-        return get$1(this, key, false, true);
-      },
-      get size() {
-        return size(this);
-      },
-      has: has$1,
-      add,
-      set: set$1,
-      delete: deleteEntry,
-      clear,
-      forEach: createForEach(false, true)
-    };
-    const readonlyInstrumentations2 = {
-      get(key) {
-        return get$1(this, key, true);
-      },
-      get size() {
-        return size(this, true);
-      },
-      has(key) {
-        return has$1.call(this, key, true);
-      },
-      add: createReadonlyMethod("add"),
-      set: createReadonlyMethod("set"),
-      delete: createReadonlyMethod("delete"),
-      clear: createReadonlyMethod("clear"),
-      forEach: createForEach(true, false)
-    };
-    const shallowReadonlyInstrumentations2 = {
-      get(key) {
-        return get$1(this, key, true, true);
-      },
-      get size() {
-        return size(this, true);
-      },
-      has(key) {
-        return has$1.call(this, key, true);
-      },
-      add: createReadonlyMethod("add"),
-      set: createReadonlyMethod("set"),
-      delete: createReadonlyMethod("delete"),
-      clear: createReadonlyMethod("clear"),
-      forEach: createForEach(true, true)
-    };
-    const iteratorMethods = ["keys", "values", "entries", Symbol.iterator];
-    iteratorMethods.forEach((method) => {
-      mutableInstrumentations2[method] = createIterableMethod(method, false, false);
-      readonlyInstrumentations2[method] = createIterableMethod(method, true, false);
-      shallowInstrumentations2[method] = createIterableMethod(method, false, true);
-      shallowReadonlyInstrumentations2[method] = createIterableMethod(method, true, true);
-    });
-    return [
-      mutableInstrumentations2,
-      readonlyInstrumentations2,
-      shallowInstrumentations2,
-      shallowReadonlyInstrumentations2
-    ];
-  }
-  var [mutableInstrumentations, readonlyInstrumentations, shallowInstrumentations, shallowReadonlyInstrumentations] = /* @__PURE__ */ createInstrumentations();
+  var mutableInstrumentations = {
+    get(key) {
+      return get$1(this, key);
+    },
+    get size() {
+      return size(this);
+    },
+    has: has$1,
+    add,
+    set: set$1,
+    delete: deleteEntry,
+    clear,
+    forEach: createForEach(false, false)
+  };
+  var shallowInstrumentations = {
+    get(key) {
+      return get$1(this, key, false, true);
+    },
+    get size() {
+      return size(this);
+    },
+    has: has$1,
+    add,
+    set: set$1,
+    delete: deleteEntry,
+    clear,
+    forEach: createForEach(false, true)
+  };
+  var readonlyInstrumentations = {
+    get(key) {
+      return get$1(this, key, true);
+    },
+    get size() {
+      return size(this, true);
+    },
+    has(key) {
+      return has$1.call(this, key, true);
+    },
+    add: createReadonlyMethod("add"),
+    set: createReadonlyMethod("set"),
+    delete: createReadonlyMethod("delete"),
+    clear: createReadonlyMethod("clear"),
+    forEach: createForEach(true, false)
+  };
+  var shallowReadonlyInstrumentations = {
+    get(key) {
+      return get$1(this, key, true, true);
+    },
+    get size() {
+      return size(this, true);
+    },
+    has(key) {
+      return has$1.call(this, key, true);
+    },
+    add: createReadonlyMethod("add"),
+    set: createReadonlyMethod("set"),
+    delete: createReadonlyMethod("delete"),
+    clear: createReadonlyMethod("clear"),
+    forEach: createForEach(true, true)
+  };
+  var iteratorMethods = ["keys", "values", "entries", Symbol.iterator];
+  iteratorMethods.forEach((method) => {
+    mutableInstrumentations[method] = createIterableMethod(method, false, false);
+    readonlyInstrumentations[method] = createIterableMethod(method, true, false);
+    shallowInstrumentations[method] = createIterableMethod(method, false, true);
+    shallowReadonlyInstrumentations[method] = createIterableMethod(method, true, true);
+  });
   function createInstrumentationGetter(isReadonly2, shallow) {
     const instrumentations = shallow ? isReadonly2 ? shallowReadonlyInstrumentations : shallowInstrumentations : isReadonly2 ? readonlyInstrumentations : mutableInstrumentations;
     return (target, key, receiver) => {
@@ -1004,16 +990,16 @@ var require_reactivity_cjs = __commonJS((exports) => {
     };
   }
   var mutableCollectionHandlers = {
-    get: /* @__PURE__ */ createInstrumentationGetter(false, false)
+    get: createInstrumentationGetter(false, false)
   };
   var shallowCollectionHandlers = {
-    get: /* @__PURE__ */ createInstrumentationGetter(false, true)
+    get: createInstrumentationGetter(false, true)
   };
   var readonlyCollectionHandlers = {
-    get: /* @__PURE__ */ createInstrumentationGetter(true, false)
+    get: createInstrumentationGetter(true, false)
   };
   var shallowReadonlyCollectionHandlers = {
-    get: /* @__PURE__ */ createInstrumentationGetter(true, true)
+    get: createInstrumentationGetter(true, true)
   };
   function checkIdentityKeys(target, has2, key) {
     const rawKey = toRaw2(key);
@@ -1110,19 +1096,18 @@ var require_reactivity_cjs = __commonJS((exports) => {
     return createRef(value, true);
   }
   var RefImpl = class {
-    constructor(value, _shallow = false) {
+    constructor(_rawValue, _shallow = false) {
+      this._rawValue = _rawValue;
       this._shallow = _shallow;
       this.__v_isRef = true;
-      this._rawValue = _shallow ? value : toRaw2(value);
-      this._value = _shallow ? value : convert(value);
+      this._value = _shallow ? _rawValue : convert(_rawValue);
     }
     get value() {
       track(toRaw2(this), "get", "value");
       return this._value;
     }
     set value(newVal) {
-      newVal = this._shallow ? newVal : toRaw2(newVal);
-      if (shared.hasChanged(newVal, this._rawValue)) {
+      if (shared.hasChanged(toRaw2(newVal), this._rawValue)) {
         this._rawValue = newVal;
         this._value = this._shallow ? newVal : convert(newVal);
         trigger(toRaw2(this), "set", "value", newVal);
@@ -1381,8 +1366,10 @@ function cleanupAttributes(el, names) {
   if (!el._x_attributeCleanups)
     return;
   Object.entries(el._x_attributeCleanups).forEach(([name, value]) => {
-    (names === void 0 || names.includes(name)) && value.forEach((i) => i());
-    delete el._x_attributeCleanups[name];
+    if (names === void 0 || names.includes(name)) {
+      value.forEach((i) => i());
+      delete el._x_attributeCleanups[name];
+    }
   });
 }
 var observer = new MutationObserver(onMutate);
@@ -1392,6 +1379,7 @@ function startObservingMutations() {
   currentlyObserving = true;
 }
 function stopObservingMutations() {
+  flushObserver();
   observer.disconnect();
   currentlyObserving = false;
 }
@@ -1414,13 +1402,26 @@ function processRecordQueue() {
 function mutateDom(callback) {
   if (!currentlyObserving)
     return callback();
-  flushObserver();
   stopObservingMutations();
   let result = callback();
   startObservingMutations();
   return result;
 }
+var isCollecting = false;
+var deferredMutations = [];
+function deferMutations() {
+  isCollecting = true;
+}
+function flushAndStopDeferringMutations() {
+  isCollecting = false;
+  onMutate(deferredMutations);
+  deferredMutations = [];
+}
 function onMutate(mutations) {
+  if (isCollecting) {
+    deferredMutations = deferredMutations.concat(mutations);
+    return;
+  }
   let addedNodes = [];
   let removedNodes = [];
   let addedAttributes = new Map();
@@ -2048,10 +2049,12 @@ var Alpine = {
   get raw() {
     return raw;
   },
-  version: "3.3.4",
+  version: "3.4.1",
+  flushAndStopDeferringMutations,
   disableEffectScheduling,
   setReactivityEngine,
   addRootSelector,
+  deferMutations,
   mapAttributes,
   evaluateLater,
   setEvaluator,
@@ -2343,7 +2346,9 @@ function registerTransitionObject(el, setFunction, defaultValue = {}) {
     };
 }
 window.Element.prototype._x_toggleAndCascadeWithTransitions = function(el, value, show, hide) {
-  let clickAwayCompatibleShow = show;
+  let clickAwayCompatibleShow = () => {
+    document.visibilityState === "visible" ? requestAnimationFrame(show) : setTimeout(show);
+  };
   if (value) {
     el._x_transition ? el._x_transition.in(show) : clickAwayCompatibleShow();
     return;
@@ -2629,7 +2634,7 @@ function isBooleanAttr(attrName) {
   return booleanAttributes.includes(attrName);
 }
 function attributeShouldntBePreservedIfFalsy(name) {
-  return !["aria-pressed", "aria-checked"].includes(name);
+  return !["aria-pressed", "aria-checked", "aria-expanded"].includes(name);
 }
 
 // packages/alpinejs/src/utils/on.js
@@ -22721,7 +22726,7 @@ process.umask = function() { return 0; };
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"_args":[["axios@0.21.4","D:\\\\XAMPP\\\\htdocs\\\\CustomerProject"]],"_development":true,"_from":"axios@0.21.4","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"axios@0.21.4","name":"axios","escapedName":"axios","rawSpec":"0.21.4","saveSpec":null,"fetchSpec":"0.21.4"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_spec":"0.21.4","_where":"D:\\\\XAMPP\\\\htdocs\\\\CustomerProject","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
+module.exports = JSON.parse('{"_from":"axios@^0.21","_id":"axios@0.21.4","_inBundle":false,"_integrity":"sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==","_location":"/axios","_phantomChildren":{},"_requested":{"type":"range","registry":true,"raw":"axios@^0.21","name":"axios","escapedName":"axios","rawSpec":"^0.21","saveSpec":null,"fetchSpec":"^0.21"},"_requiredBy":["#DEV:/"],"_resolved":"https://registry.npmjs.org/axios/-/axios-0.21.4.tgz","_shasum":"c67b90dc0568e5c1cf2b0b858c43ba28e2eda575","_spec":"axios@^0.21","_where":"D:\\\\Development\\\\Servers\\\\XAMPP\\\\htdocs\\\\CustomerProject","author":{"name":"Matt Zabriskie"},"browser":{"./lib/adapters/http.js":"./lib/adapters/xhr.js"},"bugs":{"url":"https://github.com/axios/axios/issues"},"bundleDependencies":false,"bundlesize":[{"path":"./dist/axios.min.js","threshold":"5kB"}],"dependencies":{"follow-redirects":"^1.14.0"},"deprecated":false,"description":"Promise based HTTP client for the browser and node.js","devDependencies":{"coveralls":"^3.0.0","es6-promise":"^4.2.4","grunt":"^1.3.0","grunt-banner":"^0.6.0","grunt-cli":"^1.2.0","grunt-contrib-clean":"^1.1.0","grunt-contrib-watch":"^1.0.0","grunt-eslint":"^23.0.0","grunt-karma":"^4.0.0","grunt-mocha-test":"^0.13.3","grunt-ts":"^6.0.0-beta.19","grunt-webpack":"^4.0.2","istanbul-instrumenter-loader":"^1.0.0","jasmine-core":"^2.4.1","karma":"^6.3.2","karma-chrome-launcher":"^3.1.0","karma-firefox-launcher":"^2.1.0","karma-jasmine":"^1.1.1","karma-jasmine-ajax":"^0.1.13","karma-safari-launcher":"^1.0.0","karma-sauce-launcher":"^4.3.6","karma-sinon":"^1.0.5","karma-sourcemap-loader":"^0.3.8","karma-webpack":"^4.0.2","load-grunt-tasks":"^3.5.2","minimist":"^1.2.0","mocha":"^8.2.1","sinon":"^4.5.0","terser-webpack-plugin":"^4.2.3","typescript":"^4.0.5","url-search-params":"^0.10.0","webpack":"^4.44.2","webpack-dev-server":"^3.11.0"},"homepage":"https://axios-http.com","jsdelivr":"dist/axios.min.js","keywords":["xhr","http","ajax","promise","node"],"license":"MIT","main":"index.js","name":"axios","repository":{"type":"git","url":"git+https://github.com/axios/axios.git"},"scripts":{"build":"NODE_ENV=production grunt build","coveralls":"cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js","examples":"node ./examples/server.js","fix":"eslint --fix lib/**/*.js","postversion":"git push && git push --tags","preversion":"npm test","start":"node ./sandbox/server.js","test":"grunt test","version":"npm run build && grunt version && git add -A dist && git add CHANGELOG.md bower.json package.json"},"typings":"./index.d.ts","unpkg":"dist/axios.min.js","version":"0.21.4"}');
 
 /***/ })
 
