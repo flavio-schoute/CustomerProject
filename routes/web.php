@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,5 +22,7 @@ Route::middleware(['auth', 'auth:sanctum', 'verified'])->prefix('dashboard')->gr
     })->name('dashboard');
 
     // Resource routes
+
+    Route::resource('create_account', AccountController::class);
 });
 
