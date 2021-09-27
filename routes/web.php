@@ -20,6 +20,6 @@ Route::middleware(['auth', 'auth:sanctum', 'verified'])->prefix('dashboard')->gr
         return view('dashboard');
     })->name('dashboard');
 
-
+    // Resource routes
 });
 
