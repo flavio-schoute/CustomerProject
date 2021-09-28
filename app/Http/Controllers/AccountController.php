@@ -2,7 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAccountRequest;
+use App\Models\Group;
+use App\Models\Role;
+use App\Models\Student;
+use App\Models\Teacher;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Symfony\Component\Console\Input\Input;
 
 class AccountController extends Controller
 {
@@ -13,9 +22,9 @@ class AccountController extends Controller
      */
     public function index()
     {
-    
-
-        return view('admin.account.index');
+        $roles = Role::all();
+        $groups = Group::all();
+        return view('admin.account.index', compact(array('roles', 'groups')));
     }
 
     /**
@@ -34,13 +43,41 @@ class AccountController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreAccountRequest $request)
     {
-        $this->validate($request, [
-            'email' => 'required|email',
-            'password' => 'required',
-            'firstname' => 'required'
+
+
+//        $selected_role = $request->get('role');
+        // Gebruiker aanmaken
+        User::create([
+            'first_name' => $request->firstname,
+            'last_name' => $request->lastname,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role,
         ]);
+        $lastUserId = DB::getPdo()->lastInsertId();
+
+
+        //Checken met if of value in select box of docent of student
+
+        if($request->role == 2) {
+           
+            Teacher::create([
+                'user_id' => $lastUserId,
+                'phone_number' => $request->phonenumber,
+            ]);
+        }
+        else if($request->role == 3) {
+           
+            Student::create([
+                'user_id' => $lastUserId,
+                'phone_number' => $request->phonenumber,
+            ]);
+        }
+
+        //Als waar maak dan docent of student aan en dan return je terug
+        return dd("Lekker heur het zit erin!!");
     }
 
     /**
