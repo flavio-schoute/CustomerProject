@@ -45,8 +45,8 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request)
     {
-
-
+        dd($request->group);
+        
 //        $selected_role = $request->get('role');
         // Gebruiker aanmaken
         User::create([
@@ -69,10 +69,11 @@ class AccountController extends Controller
             ]);
         }
         else if($request->role == 3) {
-           
             Student::create([
                 'user_id' => $lastUserId,
-                'phone_number' => $request->phonenumber,
+                'group_id' => $request->group,
+                'date_of_birth' => date('Y-m-d', strtotime($request->birthdate)),
+                
             ]);
         }
 
