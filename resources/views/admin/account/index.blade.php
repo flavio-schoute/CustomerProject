@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
             <div>
-    	        <form action="{{ route('create_account.store') }}" method="POST">
+    	        <form action="{{ route('create_account.store') }}" method="POST" x-data="{role_id: 1}">
                     @csrf
                     <div class="px-4 py-5 bg-white sm:p-6">
                         <div class="grid grid-cols-5 gap-6">
@@ -36,27 +36,27 @@
                        
                           <div class="col-span-6 sm:col-span-3">
                             <label for="role" class="block text-sm font-medium text-gray-700">Rol</label>
-                            <select onchange='this.form.submit()' id="role" name="role" autocomplete="role" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option>Beheerder</option>
-                            <option>Student</option>
-                              <option>Docent</option>
-                           
+                            <select id="role" name="role" autocomplete="role" x-model="role_id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                              <option value="1">Beheerder</option>
+                              <option value="2">Student</option>
+                              <option value="3">Docent</option>     
                             </select>
                           </div>
 
-                          {{ old('role') }}
-    
-                          <div class="col-span-6">
+                         
+
+
+                          <div class="col-span-6" id="groupdiv" x-show="role_id == 2">
                             <label for="group" class="block text-sm font-medium text-gray-700">Klas</label>
                             <input type="text" name="group" id="group" autocomplete="group" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                           </div>
-    
-                          <div class="col-span-6 sm:col-span-6 lg:col-span-4">
+
+                          <div class="col-span-6 sm:col-span-6 lg:col-span-4" id="phonediv" x-show="role_id == 3">
                             <label for="phonenumber" class="block text-sm font-medium text-gray-700">Telefoonnummer</label>
                             <input type="text" name="phonenumber" id="phonenumber" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                           </div>
     
-                          <div class="col-span-3 sm:col-span-3 lg:col-span-2">
+                          <div class="col-span-3 sm:col-span-3 lg:col-span-2" id="datediv" x-show="role_id == 2">
                             <label for="birthdate" class="block text-sm font-medium text-gray-700">Geboortedatum</label>
                             <input type="date" name="birthdate" id="birthdate" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                           </div>
@@ -69,4 +69,5 @@
             </div>
         </div>
     </div>
+
 </x-app-layout>
