@@ -36,12 +36,15 @@
                        
                           <div class="col-span-6 sm:col-span-3">
                             <label for="role" class="block text-sm font-medium text-gray-700">Rol</label>
-                            <select id="role" name="role" autocomplete="role" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                              <option>Student</option>
+                            <select onchange='this.form.submit()' id="role" name="role" autocomplete="role" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option>Beheerder</option>
+                            <option>Student</option>
                               <option>Docent</option>
-                              <option>Beheerder</option>
+                           
                             </select>
                           </div>
+
+                          {{ old('role') }}
     
                           <div class="col-span-6">
                             <label for="group" class="block text-sm font-medium text-gray-700">Klas</label>
