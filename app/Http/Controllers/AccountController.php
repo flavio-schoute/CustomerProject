@@ -45,9 +45,7 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request)
     {
-        dd($request->group);
-        
-//        $selected_role = $request->get('role');
+
         // Gebruiker aanmaken
         User::create([
             'first_name' => $request->firstname,
