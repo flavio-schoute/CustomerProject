@@ -25,10 +25,14 @@ class AccountController extends Controller
      */
     public function index()
     {
+        // Check if the user has the role / permission to access this page
         abort_if(Gate::denies('create-accounts'), 403);
 
+        // Get all the roles and groups
         $roles = Role::all();
         $groups = Group::all();
+
+        // Return the view and send the data to it
         return view('admin.account.index', compact(array('roles', 'groups')));
     }
 
@@ -45,14 +49,12 @@ class AccountController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     * @return Response
+     * @param StoreAccountRequest $request
+     * @return Application|Factory|View
      */
     public function store(StoreAccountRequest $request)
     {
-
-        // Gebruiker aanmaken
-
+        // Create global / general user
         $user = User::create([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,
@@ -60,27 +62,24 @@ class AccountController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $request->role,
         ]);
-        
-        //Checken met if of value in select box of docent of student
 
+        // Check if the user is creating a teacher or student
         if($request->role == 2) {
-
             Teacher::create([
                 'user_id' => $user->id,
                 'phone_number' => $request->phonenumber,
             ]);
-        }
-        else if($request->role == 3) {
+        } else if($request->role == 3) {
             Student::create([
                 'user_id' => $user->id,
                 'group_id' => $request->group,
                 'date_of_birth' => date('Y-m-d', strtotime($request->birthdate)),
-
             ]);
         }
 
-        //Als waar maak dan docent of student aan en dan return je terug
-        return dd("Lekker heur het zit erin!!");
+        // TODO
+        // Return message so the user know it succeeded
+        return view('admin.account.index');
     }
 
     /**
