@@ -47,6 +47,7 @@ class AccountController extends Controller
     {
 
         // Gebruiker aanmaken
+        
         User::create([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,
@@ -54,6 +55,7 @@ class AccountController extends Controller
             'password' => Hash::make($request->password),
             'role_id' => $request->role,
         ]);
+        
         $lastUserId = DB::getPdo()->lastInsertId();
 
 
