@@ -8,20 +8,25 @@ use App\Models\Role;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\Console\Input\Input;
 
 class AccountController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Application|Factory|View
      */
     public function index()
     {
+        abort_if(Gate::denies('create-accounts'), 403);
+
         $roles = Role::all();
         $groups = Group::all();
         return view('admin.account.index', compact(array('roles', 'groups')));
@@ -30,7 +35,7 @@ class AccountController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -40,15 +45,15 @@ class AccountController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(StoreAccountRequest $request)
     {
 
         // Gebruiker aanmaken
-        
-        User::create([
+
+        $user = User::create([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,
             'email' => $request->email,
@@ -56,24 +61,21 @@ class AccountController extends Controller
             'role_id' => $request->role,
         ]);
         
-        $lastUserId = DB::getPdo()->lastInsertId();
-
-
         //Checken met if of value in select box of docent of student
 
         if($request->role == 2) {
-           
+
             Teacher::create([
-                'user_id' => $lastUserId,
+                'user_id' => $user->id,
                 'phone_number' => $request->phonenumber,
             ]);
         }
         else if($request->role == 3) {
             Student::create([
-                'user_id' => $lastUserId,
+                'user_id' => $user->id,
                 'group_id' => $request->group,
                 'date_of_birth' => date('Y-m-d', strtotime($request->birthdate)),
-                
+
             ]);
         }
 
@@ -85,7 +87,7 @@ class AccountController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id)
     {
@@ -96,7 +98,7 @@ class AccountController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -106,9 +108,9 @@ class AccountController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id)
     {
@@ -119,7 +121,7 @@ class AccountController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {

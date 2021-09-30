@@ -15,6 +15,12 @@
                     <x-jet-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-jet-nav-link>
+
+                    @can('create-accounts')
+                    <x-jet-nav-link href="{{ route('admin.create_account.index') }}" :active="request()->routeIs('admin.create_account.index')">
+                        {{ __('Accounts aanmaken') }}
+                    </x-jet-nav-link>
+                    @endcan
                 </div>
             </div>
 
