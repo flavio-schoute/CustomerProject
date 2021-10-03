@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UploadFileRequest;
+use App\Imports\UsersImport;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FileController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return Application|Factory|View
      */
     public function index()
     {
@@ -30,12 +37,14 @@ class FileController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     * @return Response
+     * @param UploadFileRequest $request
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(UploadFileRequest $request)
     {
-        //
+        (new UsersImport)->import(request()->file('user-file'));
+
+        return redirect()->route('dashboard')->with('success', 'Leerlingen geïmporteerd!');
     }
 
     /**
@@ -82,4 +91,5 @@ class FileController extends Controller
     {
         //
     }
+
 }
