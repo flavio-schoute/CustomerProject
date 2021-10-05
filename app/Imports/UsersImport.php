@@ -3,7 +3,6 @@
 namespace App\Imports;
 
 use App\Models\User;
-use BaconQrCode\Common\Mode;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\Importable;
