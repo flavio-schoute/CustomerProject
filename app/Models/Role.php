@@ -13,4 +13,9 @@ class Role extends Model
     public const IS_TEACHER = 2;
     public const IS_STUDENT = 3;
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

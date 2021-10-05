@@ -81,7 +81,7 @@
                                         </td>
 
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            <form class="inline-block" action="#" method="POST" onsubmit="return confirm('Weet je zeker dat je deze leraar wil verwijderen?');">
+                                            <form class="inline-block" action="{{ route('admin.overview.destroy', $user) }}" method="POST" onsubmit="return confirm('Weet je zeker dat je deze leraar wil verwijderen?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <input type="submit" class="text-red-600 hover:text-red-900 bg-transparent" value="Verwijderen">

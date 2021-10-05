@@ -16,6 +16,8 @@ class AccountOverviewController extends Controller
     public function index()
     {
         $users = User::all();
+        //$roles = Role::with('user')->get();
+        //dd($roles);
         return view('admin.overview.index', compact('users'));
     }
 
@@ -80,8 +82,10 @@ class AccountOverviewController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        //
+        $user->delete();
+
+        return back();
     }
 }
