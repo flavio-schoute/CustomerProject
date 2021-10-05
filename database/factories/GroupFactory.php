@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Group;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class GroupFactory extends Factory
 {
@@ -22,7 +23,7 @@ class GroupFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->name()
         ];
     }
 }

@@ -13,7 +13,7 @@ class CreateOverviewTestTable extends Migration
      */
     public function up()
     {
-        Schema::create('overview_test', function (Blueprint $table) {
+        Schema::create('tests_overview', function (Blueprint $table) {
             $table->id();
             $table->foreignId('test_id')->constrained();
             $table->unsignedDouble('final_grade');

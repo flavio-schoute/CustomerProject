@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGroupTestTable extends Migration
+class StudentTest extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateGroupTestTable extends Migration
      */
     public function up()
     {
-        Schema::create('group_test', function (Blueprint $table) {
-            $table->foreignId('group_id')->constrained();
+        Schema::create('student_test', function (Blueprint $table) {
             $table->foreignId('test_id')->constrained();
+            $table->foreignId('student_id')->constrained();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ class CreateGroupTestTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('group_test');
+        Schema::dropIfExists('student_test');
     }
 }

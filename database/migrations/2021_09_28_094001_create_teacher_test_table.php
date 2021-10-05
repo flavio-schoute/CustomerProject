@@ -14,7 +14,6 @@ class CreateTeacherTestTable extends Migration
     public function up()
     {
         Schema::create('teacher_test', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('teacher_id')->constrained();
             $table->foreignId('test_id')->constrained();
             $table->timestamps();
