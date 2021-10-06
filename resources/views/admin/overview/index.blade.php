@@ -42,7 +42,8 @@
                                         </th>
 
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            <a href="{{route('admin.overview.index', ['column' => 'role.name', 'direction' => 'asc'])}}">Rol</a>
+{{--                                            <a href="{{route('admin.overview.index', ['column' => 'role_id', 'direction' => 'asc'])}}">Rol</a>--}}
+                                            Rol
                                         </th>
 										<th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Actie
