@@ -16,9 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             GroupSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            StudentSeeder::class,
         ]);
-
-        // \App\Models\User::factory(10)->create();
     }
 }

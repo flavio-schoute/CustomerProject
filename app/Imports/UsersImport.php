@@ -2,53 +2,71 @@
 
 namespace App\Imports;
 
+use App\Models\Group;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Validators\Failure;
 
-class UsersImport implements ToModel, WithHeadingRow, SkipsOnError, WithValidation, SkipsOnFailure
+class UsersImport implements ToCollection,
+    WithHeadingRow,
+    SkipsOnError,
+    WithValidation,
+    SkipsOnFailure
 {
     use Importable, SkipsErrors, SkipsFailures;
 
     /**
-    * @param array $row
-    *
-    * @return Model|null
-    */
-    public function model(array $row)
+     * @param Collection $collection
+     * @return Model|User
+     */
+    public function collection(Collection $collection): Collection
     {
-        return new User([
-            'first_name'     => $row['first_name'],
-            'last_name'     => $row['last_name'],
-            'email'    => $row['email'],
-            'password' => Hash::make($row['password']),
-            'role_id' => 3,
-        ]);
+        $userCollection = new Collection();
 
+        foreach ($collection as $row) {
+            DB::transaction(function () use ($row, $userCollection) {
+                $user = User::create([
+                    'first_name' => $row['first_name'],
+                    'last_name' => $row['last_name'],
+                    'email' => $row['email'],
+                    'password' => Hash::make($row['password']),
+                    'role_id' => 3,
+                ]);
 
+                $user->student()->create([
+                    'group_id' => Group::pluck('id')->random(),
+                    'date_of_birth' => now()->toDateString(),
+                ]);
+                $userCollection->add($user);
 
+            });
+        }
+        return $userCollection;
     }
 
     public function rules(): array
     {
         return [
-          '*.email' => ['email', 'unique:user,email'],
+            '*.email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email'),
+            ],
+            '*.password' => [
+                'required',
+                'string'
+            ]
         ];
     }
-
-    public function onFailure(Failure ...$failures)
-    {
-
-    }
-
-
 }

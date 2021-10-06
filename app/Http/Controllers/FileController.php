@@ -10,10 +10,16 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Maatwebsite\Excel\Facades\Excel;
 
 class FileController extends Controller
 {
+    private $usersImport;
+
+    public function __construct(UsersImport $usersImport)
+    {
+        $this->usersImport = $usersImport;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -40,9 +46,15 @@ class FileController extends Controller
      * @param UploadFileRequest $request
      * @return RedirectResponse
      */
-    public function store(UploadFileRequest $request)
+    public function store(UploadFileRequest $request): RedirectResponse
     {
-        (new UsersImport)->import(request()->file('user-file'));
+        $file = request()->file('user-file')->store('import');
+
+        $this->usersImport->import($file, null, \Maatwebsite\Excel\Excel::XLSX);
+
+        if ($this->usersImport->failures()->isNotEmpty()) {
+            return redirect()->route('dashboard')->with('failures', $this->usersImport->failures());
+        }
 
         return redirect()->route('dashboard')->with('success', 'Leerlingen geïmporteerd!');
     }
@@ -50,7 +62,7 @@ class FileController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function show($id)
@@ -61,7 +73,7 @@ class FileController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function edit($id)
@@ -73,7 +85,7 @@ class FileController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function update(Request $request, $id)
@@ -84,7 +96,7 @@ class FileController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function destroy($id)

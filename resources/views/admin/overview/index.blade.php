@@ -33,7 +33,7 @@
                                             ID
                                         </th>
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Voornaam
+                                            <a href="{{route('admin.overview.index', ['column' => 'role.name', 'direction' => 'asc'])}}" >Voornaam</a>
                                         </th>
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Achternaam
@@ -54,10 +54,11 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    @foreach($users as $user)
+
+                                    @foreach($users->items() as $user)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            {{$user->id}}
+                                            {{ $user->id }}
                                         </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -77,7 +78,7 @@
                                         </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            Beheerder
+                                            {{$user->role->name}}
                                         </td>
 
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -93,6 +94,7 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            {{ $users->links() }}
                         </div>
                     </div>
                 </div>

@@ -24,12 +24,17 @@ class StoreAccountRequest extends FormRequest
     public function rules()
     {
         return [
-            'firstname' => 'required|max: 255',
+            'firstname' => [
+                'required',
+                'max: 255'
+            ],
             'lastname' => 'required|max: 255',
             'email' => 'required|email|max: 255',
             'password' => 'required|confirmed',
             'phonenumber' => 'regex:/06([0-9]{8})/',
-            
+            'role_id' => [
+                'numeric'
+            ]
         ];
     }
 }

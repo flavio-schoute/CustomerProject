@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -54,7 +55,13 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request)
     {
-        // Create global / general user
+        /**
+         * This is a secure way to get the validated values from the request. And a way to store them.
+         */
+        // $userValidation = $request->safe()->only('firstname', 'lastname', 'email', 'password', 'role_id');
+        // or
+        // $validated = $request->validated();
+
         $user = User::create([
             'first_name' => $request->firstname,
             'last_name' => $request->lastname,

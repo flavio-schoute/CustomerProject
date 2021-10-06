@@ -22,7 +22,7 @@ class StudentFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'date_of_birth' => now()
         ];
     }
 }

@@ -28,6 +28,6 @@ class CreateOverviewTestTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('overview_test');
+        Schema::dropIfExists('tests_overview');
     }
 }
