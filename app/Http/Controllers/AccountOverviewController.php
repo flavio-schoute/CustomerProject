@@ -91,10 +91,10 @@ class AccountOverviewController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        $user->delete();
+        $user = User::whereId($id)->delete();
 
-        return back();
+        return redirect()->back()->with('success','The user is deleted');
     }
 }

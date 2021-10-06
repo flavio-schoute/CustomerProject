@@ -15,10 +15,9 @@ class CreateStudentsTable extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
 //            $table->foreignId('school_id')->constrained();
-            $table->foreignId('group_id')->constrained();
-
+            $table->foreignId('group_id')->constrained()->onDelete('cascade');
             $table->date('date_of_birth');
             $table->timestamps();
         });
