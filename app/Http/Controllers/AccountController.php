@@ -58,17 +58,11 @@ class AccountController extends Controller
         /**
          * This is a secure way to get the validated values from the request. And a way to store them.
          */
-        // $userValidation = $request->safe()->only('firstname', 'lastname', 'email', 'password', 'role_id');
+        $userValidation = $request->safe()->only('firstname', 'lastname', 'email', 'password', 'role_id');
         // or
         // $validated = $request->validated();
 
-        $user = User::create([
-            'first_name' => $request->firstname,
-            'last_name' => $request->lastname,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role,
-        ]);
+        $user = User::create($userValidation);
 
         // Check if the user is creating a teacher or student
         if($request->role == 2) {
