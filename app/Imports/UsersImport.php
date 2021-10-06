@@ -27,13 +27,20 @@ class UsersImport implements ToCollection,
     use Importable, SkipsErrors, SkipsFailures;
 
     /**
+     * Imports the data in the database
+     *
      * @param Collection $collection
      * @return Model|User
      */
     public function collection(Collection $collection): Collection
     {
+        // Create new collection
         $userCollection = new Collection();
 
+        /*
+         * Loop through the collection, we use transaction because if the
+         * `$user->student()->create` fails we don't insert the user or visa-versa
+         */
         foreach ($collection as $row) {
             DB::transaction(function () use ($row, $userCollection) {
                 $user = User::create([
@@ -48,8 +55,8 @@ class UsersImport implements ToCollection,
                     'group_id' => Group::pluck('id')->random(),
                     'date_of_birth' => now()->toDateString(),
                 ]);
-                $userCollection->add($user);
 
+                $userCollection->add($user);
             });
         }
         return $userCollection;

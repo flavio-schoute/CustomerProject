@@ -16,9 +16,6 @@ class StudentSeeder extends Seeder
      */
     public function run()
     {
-        Student::factory()->create([
-            'user_id' => User::where('role_id', 3)->get()->random()->id,
-            'group_id' => Group::pluck('id')->random()
-        ]);
+        Student::factory(5)->create();
     }
 }

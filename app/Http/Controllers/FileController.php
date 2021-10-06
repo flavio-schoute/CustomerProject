@@ -10,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Maatwebsite\Excel\Excel;
 
 class FileController extends Controller
 {
@@ -48,15 +49,18 @@ class FileController extends Controller
      */
     public function store(UploadFileRequest $request): RedirectResponse
     {
-        $file = request()->file('user-file')->store('import');
+        // Get the requested file and store it
+        $file = $request->file('user-file')->store('import');
 
-        $this->usersImport->import($file, null, \Maatwebsite\Excel\Excel::XLSX);
+        // Start the import in userImport class, with the requested file
+        $this->usersImport->import($file, null, Excel::XLSX);
 
+        // Check if there are any failures, if so then redirect with the failures, but it succeeded
         if ($this->usersImport->failures()->isNotEmpty()) {
             return redirect()->route('dashboard')->with('failures', $this->usersImport->failures());
         }
 
-        return redirect()->route('dashboard')->with('success', 'Leerlingen geïmporteerd!');
+        return redirect()->route('admin.upload.index')->with('success', 'Leerlingen geïmporteerd!');
     }
 
     /**
