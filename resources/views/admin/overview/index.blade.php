@@ -33,7 +33,7 @@
                                             ID
                                         </th>
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            <a href="{{route('admin.overview.index', ['column' => 'role.name', 'direction' => 'asc'])}}" >Voornaam</a>
+                                            Voornaam
                                         </th>
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Achternaam
@@ -41,12 +41,9 @@
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Email
                                         </th>
-                                        <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Geboortedatum
-                                        </th>
 
                                         <th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Rol
+                                            <a href="{{route('admin.overview.index', ['column' => 'role.name', 'direction' => 'asc'])}}">Rol</a>
                                         </th>
 										<th scope="col" class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Actie
@@ -71,10 +68,6 @@
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                             {{$user->email}}
-                                        </td>
-
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                            19/2/1999
                                         </td>
 
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
