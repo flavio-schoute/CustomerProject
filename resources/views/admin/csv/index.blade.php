@@ -62,7 +62,7 @@
                     <form action="{{ route('admin.upload.store') }}" method="POST" enctype="multipart/form-data" class="my-8">
                         @csrf
 
-                        <div>
+                        <div class="mx-5">
                             <div class="flex items-center mb-5">
                                 <label for="number" class="w-20 mr-6 text-right font-bold text-gray-600">Bestand:</label>
                                 <input type="file" id="file" name="user-file" placeholder="file" accept=".xlsx" class="flex-1 py-2 border-b-2 border-gray-400 focus:border-green-400 text-gray-600 placeholder-gray-400 outline-none">

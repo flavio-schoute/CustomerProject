@@ -14,16 +14,15 @@ class GroupSeeder extends Seeder
      */
     public function run()
     {
-//        Group::factory(8)->create();
-        Group::create([
+        Group::factory()->create([
             'name' => 'Groep 1'
         ]);
 
-        Group::create([
+        Group::factory()->create([
             'name' => 'Groep 2'
         ]);
 
-        Group::create([
+        Group::factory()->create([
             'name' => 'Groep 3'
         ]);
     }
