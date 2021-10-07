@@ -42,22 +42,26 @@ class UsersImport implements ToCollection,
          * `$user->student()->create` fails we don't insert the user or visa-versa
          */
         foreach ($collection as $row) {
-            DB::transaction(function () use ($row, $userCollection) {
-                $user = User::create([
-                    'first_name' => $row['first_name'],
-                    'last_name' => $row['last_name'],
-                    'email' => $row['email'],
-                    'password' => Hash::make($row['password']),
-                    'role_id' => 3,
-                ]);
+            try {
+                DB::transaction(function () use ($row, $userCollection) {
+                    $user = User::create([
+                        'first_name' => $row['first_name'],
+                        'last_name' => $row['last_name'],
+                        'email' => $row['email'],
+                        'password' => Hash::make($row['password']),
+                        'role_id' => 3,
+                    ]);
 
-                $user->student()->create([
-                    'group_id' => Group::pluck('id')->random(),
-                    'date_of_birth' => now()->toDateString(),
-                ]);
+                    $user->student()->create([
+                        'group_id' => Group::pluck('id')->random(),
+                        'date_of_birth' => now()->toDateString(),
+                    ]);
 
-                $userCollection->add($user);
-            });
+                    $userCollection->add($user);
+                });
+            } catch (\Exception $exception) {
+                // Ignore
+            }
         }
         return $userCollection;
     }

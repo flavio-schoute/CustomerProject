@@ -62,7 +62,7 @@ class FileController extends Controller
 
         // Check if there are any failures, if so then redirect with the failures, but it succeeded
         if ($this->usersImport->failures()->isNotEmpty()) {
-            return redirect()->route('dashboard')->with('failures', $this->usersImport->failures());
+            return redirect()->route('admin.upload.index')->with('failures', $this->usersImport->failures());
         }
 
         return redirect()->route('admin.upload.index')->with('success', 'Leerlingen geïmporteerd!');
