@@ -30,7 +30,7 @@ class TestPolicy
      */
     public function view(User $user, Test $test)
     {
-        //
+
     }
 
     /**

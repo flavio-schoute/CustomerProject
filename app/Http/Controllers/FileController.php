@@ -10,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Excel;
 
 class FileController extends Controller
@@ -25,9 +26,13 @@ class FileController extends Controller
      * Display a listing of the resource.
      *
      * @return Application|Factory|View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index()
     {
+        // Check if the user has the role / permission to access this page
+        abort_if(Gate::denies('import-accounts'), 403);
+
         return view('admin.csv.index');
     }
 

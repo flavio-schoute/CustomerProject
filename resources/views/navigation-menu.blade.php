@@ -16,15 +16,28 @@
                         {{ __('Dashboard') }}
                     </x-jet-nav-link>
 
+                    <!-- Available for every user -->
+                    <x-jet-nav-link href="javascript:void(0)">
+                        {{ __('Toetsen') }}
+                    </x-jet-nav-link>
+
+                    @can('test-overview')
+                    <x-jet-nav-link href="javascript:void(0)">
+                        {{ __('Toetsen overzicht') }}
+                    </x-jet-nav-link>
+                    @endcan
+
+                    @can('import-accounts')
+                    <x-jet-nav-link href="{{ route('admin.upload.index') }}" :active="request()->routeIs('admin.upload.index')">
+                        {{ __('Leerlingen importeren') }}
+                    </x-jet-nav-link>
+                    @endcan
+
                     @can('create-accounts')
                     <x-jet-nav-link href="{{ route('admin.create_account.index') }}" :active="request()->routeIs('admin.create_account.index')">
                         {{ __('Accounts aanmaken') }}
                     </x-jet-nav-link>
                     @endcan
-
-                    <x-jet-nav-link href="{{ route('admin.upload.index') }}" :active="request()->routeIs('admin.upload.index')">
-                        {{ __('Leerlingen importeren') }}
-                    </x-jet-nav-link>
                 </div>
             </div>
 

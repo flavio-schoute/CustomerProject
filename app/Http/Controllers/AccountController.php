@@ -5,16 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreAccountRequest;
 use App\Models\Group;
 use App\Models\Role;
-use App\Models\Student;
-use App\Models\Teacher;
 use App\Models\User;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
@@ -34,7 +32,7 @@ class AccountController extends Controller
         $groups = Group::all();
 
         // Return the view and send the data to it
-        return view('admin.account.index', compact(array('roles', 'groups')));
+        return view('admin.account.index', compact('roles', 'groups'));
     }
 
     /**
@@ -51,42 +49,41 @@ class AccountController extends Controller
      * Store a newly created resource in storage.
      *
      * @param StoreAccountRequest $request
-     * @return Application|Factory|View
+     * @return RedirectResponse
      */
-    public function store(StoreAccountRequest $request)
+    public function store(StoreAccountRequest $request): RedirectResponse
     {
         /**
          * This is a secure way to get the validated values from the request. And a way to store them.
          */
-        $userValidation = $request->safe()->only('firstname', 'lastname', 'email', 'password', 'role_id');
-        // or
-        // $validated = $request->validated();
+        $userValidation = $request->safe()->only('first_name', 'last_name', 'email', 'password', 'role_id');
+        $userValidation['password'] = Hash::make($userValidation['password']);
 
         $user = User::create($userValidation);
 
-        // Check if the user is creating a teacher or student
-        if($request->role == 2) {
-            Teacher::create([
-                'user_id' => $user->id,
-                'phone_number' => $request->phonenumber,
-            ]);
-        } else if($request->role == 3) {
-            Student::create([
-                'user_id' => $user->id,
-                'group_id' => $request->group,
-                'date_of_birth' => date('Y-m-d', strtotime($request->birthdate)),
+        if ($userValidation['role_id'] == Role::IS_TEACHER) {
+            $teacherValidation = $request->safe()->only('phonenumber');
+            $user->teacher()->create([
+                'phone_number' => $teacherValidation['phonenumber'],
             ]);
         }
 
-        // TODO
+        if ($userValidation['role_id'] == Role::IS_STUDENT) {
+            $studentValidation = $request->safe()->only('group_id', 'birthdate');
+            $user->student()->create([
+                'group_id' => $studentValidation['group_id'],
+                'date_of_birth' => $studentValidation['birthdate']
+            ]);
+        }
+
         // Return message so the user know it succeeded
-        return view('admin.account.index')->with('success','The user is created');
+        return redirect()->route('admin.create_account.index')->with('success', 'Account aangemaakt!');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function show($id)
@@ -97,7 +94,7 @@ class AccountController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function edit($id)
@@ -109,7 +106,7 @@ class AccountController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function update(Request $request, $id)
@@ -120,7 +117,7 @@ class AccountController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return Response
      */
     public function destroy($id)

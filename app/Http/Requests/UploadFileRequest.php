@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class UploadFileRequest extends FormRequest
 {
@@ -13,6 +14,8 @@ class UploadFileRequest extends FormRequest
      */
     public function authorize()
     {
+        abort_if(Gate::denies('import-accounts'), 403);
+
         return true;
     }
 
@@ -24,7 +27,10 @@ class UploadFileRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'user-file' => [
+                'required',
+                'file'
+            ]
         ];
     }
 }
