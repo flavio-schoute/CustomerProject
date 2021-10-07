@@ -96,10 +96,15 @@ class AccountOverviewController extends Controller
      * @param  int  $id
      * @return Response
      */
+    
+
+     /**Deletes the user from table */
     public function destroy($id)
     {
+        //Finds the id from that user that you wants to delete
         $user = User::whereId($id)->delete();
 
+        //Redirects the user with message the user is deleted
         return redirect()->back()->with('success','The user is deleted');
     }
 }

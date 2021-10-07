@@ -80,7 +80,7 @@ class AccountController extends Controller
 
         // TODO
         // Return message so the user know it succeeded
-        return view('admin.account.index');
+        return view('admin.account.index')->with('success','The user is created');
     }
 
     /**
