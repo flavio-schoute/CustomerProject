@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountOverviewController;
+use App\Http\Controllers\FileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,11 +15,27 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::redirect('/', '/login');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware(['auth', 'auth:sanctum', 'verified'])->prefix('dashboard')->group(function () {
+
+    Route::get('/', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Resource routes
+    Route::group(['middleware' => 'role:admin', 'prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::resource('create_account', AccountController::class);
+        Route::resource('upload', FileController::class);
+        Route::resource('overview', AccountOverviewController::class);
+    });
+
+    Route::group(['middleware' => 'role:teacher', 'prefix' => 'teacher', 'as' => 'teacher.'], function () {
+
+    });
+
+    Route::group(['middleware' => 'role:student', 'prefix' => 'student', 'as' => 'student.'], function () {
+
+    });
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
