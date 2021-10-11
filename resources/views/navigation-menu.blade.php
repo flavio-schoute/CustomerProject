@@ -38,6 +38,10 @@
                         {{ __('Accounts aanmaken') }}
                     </x-jet-nav-link>
                     @endcan
+
+                    <x-jet-nav-link href="{{ route('admin.overview.index') }}" :active="request()->routeIs('admin.overview.index')">
+                        {{ __('Overzicht accounts') }}
+                    </x-jet-nav-link>
                 </div>
             </div>
 

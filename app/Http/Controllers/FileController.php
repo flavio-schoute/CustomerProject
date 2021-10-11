@@ -26,7 +26,6 @@ class FileController extends Controller
      * Display a listing of the resource.
      *
      * @return Application|Factory|View
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index()
     {
