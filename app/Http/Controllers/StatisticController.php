@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
+use DB;
 
 class StatisticController extends Controller
 {
@@ -13,7 +16,12 @@ class StatisticController extends Controller
      */
     public function index()
     {
-        return view('admin.statistics.index');
+        $users = DB::table('users')
+        ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as views'))
+        ->groupBy('date')
+        ->get();
+
+        return view('admin.statistics.index', compact('users'));
     }
 
     /**

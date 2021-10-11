@@ -5,6 +5,7 @@ use App\Http\Controllers\AccountOverviewController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\StatisticController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChartJsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +32,7 @@ Route::middleware(['auth', 'auth:sanctum', 'verified'])->prefix('dashboard')->gr
         Route::resource('overview', AccountOverviewController::class);
         Route::resource('statistic', StatisticController::class);
     });
-
+    
     Route::group(['middleware' => 'role:teacher', 'prefix' => 'teacher', 'as' => 'teacher.'], function () {
 
     });
