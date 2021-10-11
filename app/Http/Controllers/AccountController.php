@@ -53,9 +53,7 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request): RedirectResponse
     {
-        /**
-         * This is a secure way to get the validated values from the request. And a way to store them.
-         */
+        // This is a secure way to get the validated values from the request and a way to store them
         $userValidation = $request->safe()->only('first_name', 'last_name', 'email', 'password', 'role_id');
         $userValidation['password'] = Hash::make($userValidation['password']);
 

@@ -66,6 +66,11 @@ class UsersImport implements ToCollection,
         return $userCollection;
     }
 
+    /**
+     * Validation rules for CSV import
+     *
+     * @return array
+     */
     public function rules(): array
     {
         return [
