@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Charts\RegisteredUsers;
+use App\Charts\CountRoles;
 use DB;
 
 class StatisticController extends Controller
@@ -14,14 +16,9 @@ class StatisticController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(RegisteredUsers $barChart, CountRoles $pieChart)
     {
-        $users = DB::table('users')
-        ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as views'))
-        ->groupBy('date')
-        ->get();
-
-        return view('admin.statistics.index', compact('users'));
+        return view('admin.statistics.index', ['barChart' => $barChart->build()], ['pieChart' => $pieChart->build()]);
     }
 
     /**
