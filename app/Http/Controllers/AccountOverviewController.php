@@ -22,16 +22,7 @@ class AccountOverviewController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO
-        // Feature for ordering the data from admin to student or reverse
-//        $column = $request->get('column');
-//        $direction = $request->get('direction');
-//        if ($column === null || $direction === null) {
-//            $users = User::with('role')->paginate(25);
-//        } else {
-//            $users = User::with('role')->orderBy($column, $direction)->paginate(25);
-//        }
-
+        //HAALT USERS UIT DE DATABASE
         $users = User::with('role')->where('role_id', '!=', Role::IS_SUPER_ADMIN)->orderBy('id', 'desc')->paginate(25);
 
 

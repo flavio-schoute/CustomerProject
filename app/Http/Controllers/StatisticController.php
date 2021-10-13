@@ -20,6 +20,7 @@ class StatisticController extends Controller
      */
     public function index(RegisteredUsers $barChart, CountRoles $pieChart)
     {
+        //Returnes the graph to index
         return view('admin.statistics.index', ['barChart' => $barChart->build()], ['pieChart' => $pieChart->build()]);
     }
 
