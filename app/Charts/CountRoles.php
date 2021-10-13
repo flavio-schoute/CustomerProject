@@ -29,7 +29,6 @@ class CountRoles
         $roles = [];
         $count = [];
         foreach($users[0] as $kv) {
-            // dd($kv);
             array_push($count, $kv->views);
             array_push($roles, $kv->rolename);
         }
