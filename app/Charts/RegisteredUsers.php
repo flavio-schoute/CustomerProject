@@ -25,12 +25,9 @@ class RegisteredUsers
         ->groupBy('date')
         ->get();
 
-        //dd($users[0][1]);
-
         $count = [];
         $month = [];
         foreach($users[0] as $kv) {
-            // dd($kv);
             array_push($count, $kv->views);
             array_push($month, $kv->date);
         }
