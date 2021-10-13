@@ -3,7 +3,9 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountOverviewController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\StatisticController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChartJsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,9 +27,10 @@ Route::middleware(['auth', 'auth:sanctum', 'verified'])->prefix('dashboard')->gr
 
     // Resource routes
     Route::group(['middleware' => 'role:admin', 'prefix' => 'admin', 'as' => 'admin.'], function () {
+        Route::resource('overview', AccountOverviewController::class);
         Route::resource('create_account', AccountController::class);
         Route::resource('upload', FileController::class);
-        Route::resource('overview', AccountOverviewController::class);
+        Route::resource('statistic', StatisticController::class);
     });
 
     Route::group(['middleware' => 'role:teacher', 'prefix' => 'teacher', 'as' => 'teacher.'], function () {

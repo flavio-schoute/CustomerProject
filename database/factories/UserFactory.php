@@ -34,6 +34,7 @@ class UserFactory extends Factory
             'password' => Hash::make('password'),
             'role_id' => Role::pluck('id')->random(),
             'remember_token' => Str::random(10),
+            'created_at' => $this->faker->date(),
         ];
     }
 

@@ -27,8 +27,17 @@ class AccountController extends Controller
         // Check if the user has the role / permission to access this page
         abort_if(Gate::denies('create-accounts'), 403);
 
-        // Get all the roles and groups
-        $roles = Role::all();
+        // Get all roles depending on user role
+        if (auth()->user()->role_id == Role::IS_SUPER_ADMIN) {
+            $roles = Role::all();
+        }
+
+        // Make sure the admin can only make teacher and students, the super admin can create admins
+        if (auth()->user()->role_id == Role::IS_ADMIN) {
+            $roles = Role::select('id', 'name')->where('id', '!=', Role::IS_SUPER_ADMIN)->where('id', '!=', Role::IS_ADMIN)->get();
+        }
+
+        // Get all the groups
         $groups = Group::all();
 
         // Return the view and send the data to it
@@ -53,9 +62,7 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request): RedirectResponse
     {
-        /**
-         * This is a secure way to get the validated values from the request. And a way to store them.
-         */
+        // This is a secure way to get the validated values from the request and a way to store them
         $userValidation = $request->safe()->only('first_name', 'last_name', 'email', 'password', 'role_id');
         $userValidation['password'] = Hash::make($userValidation['password']);
 

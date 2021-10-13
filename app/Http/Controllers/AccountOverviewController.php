@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateAccountRequest;
+use App\Models\Group;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -19,17 +22,8 @@ class AccountOverviewController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO
-        // Feature for ordering the data from admin to student or reverse
-//        $column = $request->get('column');
-//        $direction = $request->get('direction');
-//        if ($column === null || $direction === null) {
-//            $users = User::with('role')->paginate(25);
-//        } else {
-//            $users = User::with('role')->orderBy($column, $direction)->paginate(25);
-//        }
-
-        $users = User::with('role')->paginate(25);
+        //HAALT USERS UIT DE DATABASE
+        $users = User::with('role')->where('role_id', '!=', Role::IS_SUPER_ADMIN)->orderBy('id', 'desc')->paginate(25);
 
 
         return view('admin.overview.index', compact('users'));
@@ -70,36 +64,71 @@ class AccountOverviewController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return Response
+     * @param int $id
+     * @return Application|Factory|View
      */
-    public function edit($id)
+    public function edit(int $id)
     {
-        //
+        // Get the user by the ID, if not found it will throw 404 back
+        $user = User::findOrFail($id);
+
+        // Determine on rol which relation it should load and pass it to the view
+        if ($user->role_id == Role::IS_TEACHER) {
+            $user->loadMissing('teacher');
+        }
+
+        if ($user->role_id == Role::IS_STUDENT) {
+            $user->loadMissing('student');
+        }
+
+        $groups = Group::select('id', 'name')->get();
+
+        return view('admin.overview.edit', compact('user', 'groups'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param  int  $id
-     * @return Response
+     * @param UpdateAccountRequest $request
+     * @param int $id
+     * @return RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(UpdateAccountRequest $request, int $id): RedirectResponse
     {
-        //
+        // Get the user by the ID, if not found it will throw 404 back
+        $user = User::findOrFail($id);
+
+        // Safe way to get the validate data and update the user
+        $userValidation = $request->safe()->only('first_name', 'last_name', 'email');
+
+        $user->update($userValidation);
+
+        // Update the teacher or docent based on the role_id passed to hidden input field in the view
+        if ($user->role_id == Role::IS_TEACHER) {
+            $teacherValidation = $request->safe()->only('phonenumber');
+            $user->teacher()->update([
+                'phone_number' => $teacherValidation['phonenumber'],
+            ]);
+        }
+
+        if ($user->role_id == Role::IS_STUDENT) {
+            $studentValidation = $request->safe()->only('group_id', 'birthdate');
+            $user->student()->update([
+                'group_id' => $studentValidation['group_id'],
+                'date_of_birth' => $studentValidation['birthdate']
+            ]);
+        }
+
+        return redirect()->route('admin.overview.index')->with('success', 'Account bijgewerkt!');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return Response
+     * @param int $id
+     * @return RedirectResponse
      */
-    
-
-     /**Deletes the user from table */
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         //Finds the id from that user that you wants to delete
         $user = User::whereId($id)->delete();

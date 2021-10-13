@@ -33,7 +33,7 @@
                     @endif
 
                 <div>
-                    <form action="{{ route('admin.create_account.store') }}" method="POST" x-data="{role_id: 1}">
+                    <form action="{{ route('admin.create_account.store') }}" method="POST" x-data="{role_id: 3}">
                         @csrf
                         <div class="px-4 py-5 bg-white sm:p-6">
                             <div class="grid grid-cols-6 gap-6">
@@ -83,7 +83,7 @@
                                 </div>
 
 
-                                <div class="col-span-4" id="groupdiv" x-show="role_id == 3">
+                                <div class="col-span-4" id="groupdiv" x-show="role_id == 4">
 
                                     <label for="group" class="block text-sm font-medium text-gray-700">Klas</label>
                                     <select id="group_id" name="group_id" autocomplete="group_id" x-model="group_id"
@@ -94,13 +94,13 @@
                                     </select>
                                 </div>
 
-                                <div class="col-span-6 sm:col-span-6 lg:col-span-3" id="phonediv" x-show="role_id == 2">
+                                <div class="col-span-6 sm:col-span-6 lg:col-span-3" id="phonediv" x-show="role_id == 3">
                                     <label for="phonenumber" class="block text-sm font-medium text-gray-700">Telefoonnummer</label>
                                     <input type="text" name="phonenumber" id="phonenumber" value="{{ old('phonenumber') }}"
                                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                                 </div>
 
-                                <div class="col-span-3 sm:col-span-3 lg:col-span-2" id="datediv" x-show="role_id == 3">
+                                <div class="col-span-3 sm:col-span-3 lg:col-span-2" id="datediv" x-show="role_id == 4">
                                     <label for="birthdate"
                                            class="block text-sm font-medium text-gray-700">Geboortedatum</label>
                                     <input type="date" name="birthdate" id="birthdate"

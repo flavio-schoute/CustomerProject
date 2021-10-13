@@ -69,7 +69,7 @@
                             </div>
 
                             <div>
-                                <button class="py-3 px-8 bg-green-400 text-white font-bold">Submit</button>
+                                <button class="py-3 px-8 bg-green-400 text-white font-bold">Importeren</button>
                             </div>
                         </div>
 

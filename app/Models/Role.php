@@ -10,9 +10,10 @@ class Role extends Model
 {
     use HasFactory;
 
-    public const IS_ADMIN = 1;
-    public const IS_TEACHER = 2;
-    public const IS_STUDENT = 3;
+    public const IS_SUPER_ADMIN = 1;
+    public const IS_ADMIN = 2;
+    public const IS_TEACHER = 3;
+    public const IS_STUDENT = 4;
 
     public function users(): hasMany
     {

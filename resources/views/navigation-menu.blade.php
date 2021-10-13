@@ -21,22 +21,39 @@
                         {{ __('Toetsen') }}
                     </x-jet-nav-link>
 
+                    <!-- Available for all the teachers and admins -->
                     @can('test-overview')
                     <x-jet-nav-link href="javascript:void(0)">
                         {{ __('Toetsen overzicht') }}
                     </x-jet-nav-link>
                     @endcan
 
+                    <!-- Available for all the admins -->
                     @can('import-accounts')
                     <x-jet-nav-link href="{{ route('admin.upload.index') }}" :active="request()->routeIs('admin.upload.index')">
                         {{ __('Leerlingen importeren') }}
                     </x-jet-nav-link>
                     @endcan
 
+                    <!-- Available for all the admins, only the super admin can make admins -->
                     @can('create-accounts')
                     <x-jet-nav-link href="{{ route('admin.create_account.index') }}" :active="request()->routeIs('admin.create_account.index')">
                         {{ __('Accounts aanmaken') }}
                     </x-jet-nav-link>
+                    @endcan
+
+                    <!-- Available for all the admins, only the super admin can edit admins -->
+                    @can('accounts-overview')
+                    <x-jet-nav-link href="{{ route('admin.overview.index') }}" :active="request()->routeIs('admin.overview.index')">
+                        {{ __('Overzicht accounts') }}
+                    </x-jet-nav-link>
+                    @endcan
+
+                    <!-- Available for all the admins -->
+                    @can('view-statistic')
+                        <x-jet-nav-link href="{{ route('admin.statistic.index') }}" :active="request()->routeIs('admin.statistic.index')">
+                            {{ __('Statistieken bekijken') }}
+                        </x-jet-nav-link>
                     @endcan
                 </div>
             </div>
@@ -164,6 +181,41 @@
             <x-jet-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-jet-responsive-nav-link>
+
+            <!-- Available for every user -->
+            <x-jet-responsive-nav-link href="javascript:void(0)">
+                {{ __('Toetsen') }}
+            </x-jet-responsive-nav-link>
+
+            @can('test-overview')
+                <x-jet-responsive-nav-link href="javascript:void(0)">
+                    {{ __('Toetsen overzicht') }}
+                </x-jet-responsive-nav-link>
+            @endcan
+
+            @can('import-accounts')
+                <x-jet-responsive-nav-link href="{{ route('admin.upload.index') }}" :active="request()->routeIs('admin.upload.index')">
+                    {{ __('Leerlingen importeren') }}
+                </x-jet-responsive-nav-link>
+            @endcan
+
+            @can('create-accounts')
+                <x-jet-responsive-nav-link href="{{ route('admin.create_account.index') }}" :active="request()->routeIs('admin.create_account.index')">
+                    {{ __('Accounts aanmaken') }}
+                </x-jet-responsive-nav-link>
+            @endcan
+
+            @can('accounts-overview')
+                <x-jet-responsive-nav-link href="{{ route('admin.overview.index') }}" :active="request()->routeIs('admin.overview.index')">
+                    {{ __('Overzicht accounts') }}
+                </x-jet-responsive-nav-link>
+            @endcan
+
+            @can('view-statistic')
+                <x-jet-responsive-nav-link href="{{ route('admin.statistic.index') }}" :active="request()->routeIs('admin.statistic.index')">
+                    {{ __('Statistieken bekijken') }}
+                </x-jet-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->

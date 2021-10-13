@@ -74,6 +74,9 @@
                                         </td>
 
 										<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+
+                                            <a href="{{ route('admin.overview.edit', $user->id) }}" class="text-indigo-600 hover:text-indigo-900 mb-2 mr-2">Bewerken</a>
+
                                             <form class="inline-block" action="{{ route('admin.overview.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Weet je zeker dat je deze leraar wil verwijderen?');">
                                                 @csrf
                                                 @method('DELETE')
