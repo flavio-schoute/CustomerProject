@@ -81,6 +81,7 @@ class AccountOverviewController extends Controller
         // Get the user by the ID, if not found it will throw 404 back
         $user = User::findOrFail($id);
 
+        // Determine on rol which relation it should load and pass it to the view
         if ($user->role_id == Role::IS_TEACHER) {
             $user->loadMissing('teacher');
         }
@@ -101,14 +102,17 @@ class AccountOverviewController extends Controller
      * @param int $id
      * @return RedirectResponse
      */
-    public function update(UpdateAccountRequest $request, int $id)
+    public function update(UpdateAccountRequest $request, int $id): RedirectResponse
     {
+        // Get the user by the ID, if not found it will throw 404 back
         $user = User::findOrFail($id);
 
+        // Safe way to get the validate data and update the user
         $userValidation = $request->safe()->only('first_name', 'last_name', 'email');
 
         $user->update($userValidation);
 
+        // Update the teacher or docent based on the role_id passed to hidden input field in the view
         if ($user->role_id == Role::IS_TEACHER) {
             $teacherValidation = $request->safe()->only('phonenumber');
             $user->teacher()->update([
@@ -133,7 +137,7 @@ class AccountOverviewController extends Controller
      * @param int $id
      * @return RedirectResponse
      */
-    public function destroy(int $id)
+    public function destroy(int $id): RedirectResponse
     {
         //Finds the id from that user that you wants to delete
         $user = User::whereId($id)->delete();
