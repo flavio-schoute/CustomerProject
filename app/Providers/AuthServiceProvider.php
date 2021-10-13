@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Role;
 use App\Models\User;
+use Database\Factories\RoleFactory;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -27,16 +28,25 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Gate::define('test-overview', function (User $user) {
+            return in_array($user->role_id, [Role::IS_SUPER_ADMIN, Role::IS_ADMIN, Role::IS_TEACHER]);
+        });
+
         Gate::define('create-accounts', function (User $user) {
-            return $user->role_id == Role::IS_ADMIN;
+            return in_array($user->role_id, [Role::IS_SUPER_ADMIN, Role::IS_ADMIN]);
         });
 
         Gate::define('import-accounts', function (User $user) {
-            return $user->role_id == Role::IS_ADMIN;
+            return in_array($user->role_id, [Role::IS_SUPER_ADMIN, Role::IS_ADMIN]);
         });
 
-        Gate::define('test-overview', function (User $user) {
-            return in_array($user->role_id, [Role::IS_ADMIN, Role::IS_TEACHER]);
+        Gate::define('accounts-overview', function (User $user) {
+            return in_array($user->role_id, [Role::IS_SUPER_ADMIN, Role::IS_ADMIN]);
         });
+
+        Gate::define('view-statistic', function (User $user) {
+            return in_array($user->role_id, [Role::IS_SUPER_ADMIN, Role::IS_ADMIN]);
+        });
+
     }
 }

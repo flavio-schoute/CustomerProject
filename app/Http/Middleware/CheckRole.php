@@ -23,7 +23,7 @@ class CheckRole
             abort(403);
         }
 
-        if ($role == 'admin' && auth()->user()->role_id != Role::IS_ADMIN) {
+        if ($role == 'admin' && !in_array(auth()->user()->role_id, [Role::IS_SUPER_ADMIN, Role::IS_ADMIN])) {
             abort(403);
         }
 

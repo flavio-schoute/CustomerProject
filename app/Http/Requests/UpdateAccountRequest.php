@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -42,18 +43,20 @@ class UpdateAccountRequest extends FormRequest
                 'email',
                 'max:255',
             ],
-//            'phonenumber' => [
-//                'regex:/06([0-9]{8})/'
-//            ],
-//            'group_id' => [
-//                'exclude_unless:role_id,' . Role::IS_STUDENT,
-//                'numeric'
-//            ],
-//            'birthdate' => [
-//                'exclude_unless:role_id,' . Role::IS_STUDENT,
-//                'date',
-//                'date_format:Y-m-d'
-//            ]
+            'phonenumber' => [
+                'exclude_unless:role_id,' . Role::IS_TEACHER,
+                'required',
+                'regex:/06([0-9]{8})/'
+            ],
+            'group_id' => [
+                'exclude_unless:role_id,' . Role::IS_STUDENT,
+                'numeric'
+            ],
+            'birthdate' => [
+                'exclude_unless:role_id,' . Role::IS_STUDENT,
+                'date',
+                'date_format:Y-m-d'
+            ]
         ];
     }
 }

@@ -12,7 +12,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 
 class AccountOverviewController extends Controller
 {
@@ -33,7 +32,7 @@ class AccountOverviewController extends Controller
 //            $users = User::with('role')->orderBy($column, $direction)->paginate(25);
 //        }
 
-        $users = User::with('role')->where('role_id', '!=', Role::IS_ADMIN)->paginate(25);
+        $users = User::with('role')->where('role_id', '!=', Role::IS_SUPER_ADMIN)->paginate(25);
 
 
         return view('admin.overview.index', compact('users'));

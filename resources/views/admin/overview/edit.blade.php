@@ -24,6 +24,7 @@
             <form action="{{ route('admin.overview.update', $user->id) }}" method="POST" x-data="{role_id: {{$user->role_id}}}">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="role_id" value="{{$user->role_id}}">
 
                 <div class="mt-4">
                     <x-jet-label for="first_name" value="{{ __('Voornaam') }}"/>
@@ -41,6 +42,11 @@
                 </div>
 
                 <div class="mt-4" x-show="role_id == 3">
+                    <x-jet-label for="phonenumber" value="{{ __('Telefoon nummer') }}"/>
+                    <x-jet-input id="phonenumber" class="block mt-1 w-full" type="text" name="phonenumber"/>
+                </div>
+
+                <div class="mt-4" x-show="role_id == 4">
                     <x-jet-label for="group_id" value="{{ __('Klas') }}"/>
                     <select id="group_id" name="group_id" autocomplete="group_id" x-model="group_id"
                             class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -50,12 +56,7 @@
                     </select>
                 </div>
 
-                <div class="mt-4" x-show="role_id == 2">
-                    <x-jet-label for="phonenumber" value="{{ __('Telefoon nummer') }}"/>
-                    <x-jet-input id="phonenumber" class="block mt-1 w-full" type="text" name="phonenumber"/>
-                </div>
-
-                <div class="mt-4" x-show="role_id == 3">
+                <div class="mt-4" x-show="role_id == 4">
                     <x-jet-label for="birthdate" value="{{ __('Geboortedatum') }}"/>
                     <x-jet-input id="birthdate" class="block mt-1 w-full" type="date" name="birthdate"/>
                 </div>
@@ -63,7 +64,7 @@
 
                 <div class="flex items-center justify-center mt-4">
                     <x-jet-button>
-                        {{ __('Leerling bewerken opslaan') }}
+                        {{ __('Bewerking opslaan') }}
                     </x-jet-button>
                 </div>
             </form>
